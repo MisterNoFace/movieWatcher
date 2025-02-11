@@ -61,7 +61,7 @@ def shutdown():
 def get_files_dir():
     return os.path.dirname(os.path.realpath(__file__))
 
-movie_page_link='https://streamingcommunity.prof'
+movie_page_link='https://streamingcommunity.paris'
 opt=Options()
 opt.add_argument(argument='--headless=new')
 

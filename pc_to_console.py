@@ -66,7 +66,7 @@ while True:
                 selected_menu_option-=1
             if event.key==pygame.K_RETURN:
                 pygame.draw.rect(display,(255,255,255),[0,H/2-50,W,100])
-                display.blit(get_text('ATTENDERE CARICAMENTO PROGRAMMA...',color=(0,0,0),size=64),(100,H/2-30))
+                display.blit(get_text('LOADING...',color=(0,0,0),size=64),(100,H/2-30))
                 pygame.display.update()
                 if movie_title!='':
                     system.open_movie_from_title(movie_title)
@@ -91,7 +91,7 @@ while True:
         selected_menu_option=len(game_list.return_executable_file_names())-1
 
 
-    display.blit(get_text('SELEZIONA VIDEOGIOCO:'),(480,100))
+    display.blit(get_text('SELECT VIDEOGAME:'),(480,100))
     game_list_surface.fill((0,0,0,0))
     for index,name in enumerate(game_list.return_executable_file_names()):
         text=get_text(str(index+1)+' - '+name)
@@ -103,7 +103,7 @@ while True:
         game_list_surface.blit(text,pos)
     display.blit(game_list_surface,(480,150))
         
-    display.blit(get_text('DIGITA TITOLO FILM:'),(100,100))
+    display.blit(get_text('DIGIT MOVIE TITLE:'),(100,100))
     r=get_text(movie_title,size=40)
     pygame.draw.rect(display,(255,255,255),[100,150,r.get_width()+20,r.get_height()],5)
     display.blit(r,(110,150))
