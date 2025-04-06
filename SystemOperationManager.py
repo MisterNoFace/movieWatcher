@@ -58,8 +58,10 @@ class DirectoryManager():
 
 def shutdown():
     os.system('shutdown /p /f')
+
 def get_files_dir():
-    return os.path.dirname(os.path.realpath(__file__))
+    script_path = __file__ if '__file__' in globals() else sys.argv[0]
+    return os.path.dirname(os.path.realpath(script_path))
 
 movie_page_link='https://streamingcommunity.paris'
 opt=Options()
