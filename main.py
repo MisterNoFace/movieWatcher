@@ -1,8 +1,9 @@
-import pygame,time,random
+import pygame,random
 pygame.init()
 pygame.joystick.init()
+pygame.font.init()
 pygame.mouse.set_visible(False)
-import os,time,webbrowser
+import os,webbrowser,threading
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
@@ -17,33 +18,75 @@ particles=[]
 is_searching=False
 
 opt=Options()
-#opt.add_argument(argument='--headless=new')
+opt.add_argument(argument='--headless=new')
 
-def open_movie_from_title(title:str):
-    global is_searching
+def open_from_streamingCommunity(title:str):
+    global movie_title,is_searching
+    driver=webdriver.Chrome(options=opt)
     try:
-        driver=webdriver.Chrome(options=opt)
         movie_page_link='https://streamingcommunity.to'
         driver.get(movie_page_link)
         #driver.find_element(By.ID,"details-button").click()
         #driver.find_element(By.ID,"proceed-link").click()
         driver.find_element(By.CLASS_NAME,"search-button").click()
-        search_bar=driver.find_element(By.XPATH,'//input[@type="text" @class="form-control"]')
-        search_bar.send_keys(title)
+        driver.find_element(By.XPATH,'//input[@type="text" @class="form-control"]').send_keys(title) #search bar
         driver.implicitly_wait(1)
 
         results=driver.find_elements(By.CLASS_NAME,'slider-item')
         first_result=results[0].find_element(By.XPATH,'.//*').get_attribute('href')
-        movie_num_code=first_result[first_result.rfind('/')+1:first_result.find('-')]
+        movie_num_code=first_result[first_result.rfind('/')+1:first_result.find('-')]     
+        if is_searching: webbrowser.open(movie_page_link+'/watch/'+movie_num_code)
+        #return movie_page_link+'/watch/'+movie_num_code
+    except:
+        pass
+    is_searching=False
+    driver.quit()
+
+"""def open_from_Xprime(title:str):
+    global is_searching
+    try:
+        driver=webdriver.Chrome(options=opt)
+        driver.get('https://xprime.tv')
+        #driver.find_element(By.ID,"details-button").click()
+        #driver.find_element(By.ID,"proceed-link").click()
+        driver.find_element(By.CLASS_NAME,"search-button svelte-yrzwyi").click()
+        driver.implicitly_wait(2)
+        search_bar=driver.find_element(By.CLASS_NAME,'search-input svelte-yrzwyi visible').send_keys(title)
+
+
+        driver.find_elements(By.CLASS_NAME,'result-item svelte-kdpa49')[0].click()
+        driver.implicitly_wait(0.5)
+        driver.find_element(By.CLASS_NAME,'play-button color-primary hasLabel hasIcon ltr-kjpk1q svelte-vuiiet').click()
+        driver.implicitly_wait(0.5)
         
+        webbrowser.open(driver.current_url)
         driver.quit()
-        webbrowser.open(movie_page_link+'/watch/'+movie_num_code)
-        return True
+        return driver.current_url
 
     except:
-        return False
+        return None
+    is_searching=False"""
+
+def open_from_Hexa():
+    global movie_title,is_searching
+    driver=webdriver.Chrome(options=opt)
+    try:
+        driver.get('https://hexa.watch/search')
+        driver.implicitly_wait(2)
+        driver.find_element(By.XPATH,'//input[@type="text"]').send_keys(movie_title) #search bar
+
+        link=driver.find_elements(By.XPATH,'//a[@class="block w-full h-full"]')[0].get_attribute('href')
+        driver.get(link)
+        driver.implicitly_wait(0.5)
+        if is_searching: webbrowser.open(driver.current_url.replace('details','watch'))
+        #return driver.current_url.replace('details','watch')
+    except:
+        pass
     is_searching=False
-    
+    driver.quit()
+
+        
+
 class Particle():
     def __init__(self,pos,force,duration):
         self.x=pos[0]
@@ -100,8 +143,9 @@ def main():
                     selected_menu_option-=1
                 if event.key==pygame.K_RETURN:
                     if movie_title!='' and not is_searching:
+                        threading.Thread(target=open_from_streamingCommunity).start()
+                        threading.Thread(target=open_from_Hexa).start()
                         is_searching=True
-                        open_movie_from_title(movie_title)
                 if event.key==pygame.K_ESCAPE:
                     pygame.quit()
                 if event.key==pygame.K_F4:
@@ -116,12 +160,12 @@ def main():
                
         t=get_text('DIGIT MOVIE or TV SERIES TITLE:',size=50)
         display.blit(t,(W/2-t.get_width()/2,150))
-        t=get_text(movie_title,size=65)
-        pygame.draw.rect(display,(255,255,255),[W/2-t.get_width()/2-10,200,t.get_width()+20,t.get_height()],width=5)
+        t=get_text(movie_title,size=80)
+        pygame.draw.rect(display,(255,255,255),[W/2-t.get_width()/2-10,200,t.get_width()+20,t.get_height()+10],width=5)
         display.blit(t,(W/2-t.get_width()/2,200))
         if is_searching:
             t=get_text('Searching...',size=80,color=(0,0,0))
-            pygame.draw.rect(display,(255,255,255),[W/2-t.get_width()/2-10,H/2-t.get_height()/2,t.get_width(),t.get_height()+10],border_radius=10)
+            pygame.draw.rect(display,(255,255,255),[W/2-t.get_width()/2-10,H/2-t.get_height()/2,t.get_width(),t.get_height()],border_radius=10)
             display.blit(t,(W/2-t.get_width()/2,H/2-t.get_height()/2))
         pygame.display.update()
         clock.tick(60)
