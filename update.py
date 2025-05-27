@@ -2,7 +2,7 @@ from pathlib import Path
 import os,shutil,requests
 
 author = "MisterNoFace"  # Replace with your GitHub username
-project = "pc-to-console"  # Replace with your GitHub project name
+project = "movieWatcher"  # Replace with your GitHub project name
 CURRENT_DIR = Path(__file__).resolve().parent
 
 response = requests.get(f"https://api.github.com/repos/{author}/{project}/commits/main")
